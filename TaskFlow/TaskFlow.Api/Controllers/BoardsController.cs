@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Api.Data;
+using TaskFlow.Api.DTOs;
 using TaskFlow.Api.Models;
 
 namespace TaskFlow.Api.Controllers
@@ -75,8 +71,13 @@ namespace TaskFlow.Api.Controllers
 
         // POST: api/Boards
         [HttpPost]
-        public async Task<ActionResult<Board>> PostBoard(Board board)
+        public async Task<ActionResult<Board>> PostBoard(CreateBoardDto createBoardDto) // Renamed for clarity
         {
+            var board = new Board
+            {
+                Title = createBoardDto.Title
+            };
+
             _context.Boards.Add(board);
             await _context.SaveChangesAsync();
 
