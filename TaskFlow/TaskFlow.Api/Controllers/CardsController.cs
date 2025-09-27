@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TaskFlow.Api.Data;
-using TaskFlow.Api.Models;
+using TaskFlow.Api.DTOs;
+using TaskFlow.Api.Services;
 
 namespace TaskFlow.Api.Controllers
 {
@@ -9,93 +8,58 @@ namespace TaskFlow.Api.Controllers
     [ApiController]
     public class CardsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICardService _cardService;
 
-        public CardsController(ApplicationDbContext context)
+        public CardsController(ICardService cardService)
         {
-            _context = context;
+            _cardService = cardService;
         }
 
-        // GET: api/Cards
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Card>>> GetCards()
+        [HttpGet("list/{listId}")]
+        public async Task<ActionResult<IEnumerable<CardDto>>> GetCardsByList(int listId)
         {
-            return await _context.Cards.ToListAsync();
+            var cards = await _cardService.GetCardsByListIdAsync(listId);
+            return Ok(cards);
         }
 
-        // GET: api/Cards/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Card>> GetCard(int id)
+        public async Task<IActionResult> GetCard(int id)
         {
-            var card = await _context.Cards.FindAsync(id);
-
+            var card = await _cardService.GetCardByIdAsync(id);
             if (card == null)
             {
                 return NotFound();
             }
-
-            return card;
+            return Ok(card);
         }
 
-        // PUT: api/Cards/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCard(int id, Card card)
+        [HttpPost("list/{listId}")]
+        public async Task<IActionResult> CreateCard(int listId, CreateCardDto createCardDto)
         {
-            if (id != card.Id)
-            {
-                return BadRequest();
-            }
+            var newCard = await _cardService.CreateCardAsync(listId, createCardDto);
+            return CreatedAtAction(nameof(GetCard), new { id = newCard.Id }, newCard);
+        }
 
-            _context.Entry(card).State = EntityState.Modified;
-
-            try
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateCard(int id, UpdateCardDto updateCardDto)
+        {
+            var success = await _cardService.UpdateCardAsync(id, updateCardDto);
+            if (!success)
             {
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CardExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
             return NoContent();
         }
 
-        // POST: api/Cards
-        [HttpPost]
-        public async Task<ActionResult<Card>> PostCard(Card card)
-        {
-            _context.Cards.Add(card);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCard", new { id = card.Id }, card);
-        }
-
-        // DELETE: api/Cards/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCard(int id)
         {
-            var card = await _context.Cards.FindAsync(id);
-            if (card == null)
+            var success = await _cardService.DeleteCardAsync(id);
+            if (!success)
             {
                 return NotFound();
             }
-
-            _context.Cards.Remove(card);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool CardExists(int id)
-        {
-            return _context.Cards.Any(e => e.Id == id);
         }
     }
 }

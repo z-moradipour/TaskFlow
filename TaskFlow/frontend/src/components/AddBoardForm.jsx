@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+/* This component takes a "prop" called onCreate. This prop is a function 
+that is passed here from the parent component (App). */
 function AddBoardForm({ onCreate }) {
   const [title, setTitle] = useState('');
 

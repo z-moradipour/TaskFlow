@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TaskFlow.Api.Data;
-using TaskFlow.Api.Models;
+using TaskFlow.Api.DTOs;
+using TaskFlow.Api.Services;
 
 namespace TaskFlow.Api.Controllers
 {
@@ -9,95 +8,58 @@ namespace TaskFlow.Api.Controllers
     [ApiController]
     public class ListsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IListService _listService;
 
-        public ListsController(ApplicationDbContext context)
+        public ListsController(IListService listService)
         {
-            _context = context;
+            _listService = listService;
         }
 
-        // GET: api/Lists
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<List>>> GetLists()
+        [HttpGet("board/{boardId}")]
+        public async Task<ActionResult<IEnumerable<ListDto>>> GetListsByBoard(int boardId)
         {
-            return await _context.Lists.ToListAsync();
+            var lists = await _listService.GetListsByBoardIdAsync(boardId);
+            return Ok(lists);
         }
 
-        // GET: api/Lists/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<List>> GetList(int id)
+        public async Task<IActionResult> GetList(int id)
         {
-            var list = await _context.Lists.FindAsync(id);
-
+            var list = await _listService.GetListByIdAsync(id);
             if (list == null)
             {
                 return NotFound();
             }
-
-            return list;
+            return Ok(list);
         }
 
-        // PUT: api/Lists/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutList(int id, List list)
+        [HttpPost("board/{boardId}")]
+        public async Task<IActionResult> CreateList(int boardId, CreateListDto createListDto)
         {
-            if (id != list.Id)
-            {
-                return BadRequest();
-            }
+            var newList = await _listService.CreateListAsync(boardId, createListDto);
+            return CreatedAtAction(nameof(GetList), new { id = newList.Id }, newList);
+        }
 
-            _context.Entry(list).State = EntityState.Modified;
-
-            try
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateList(int id, UpdateListDto updateListDto)
+        {
+            var success = await _listService.UpdateListAsync(id, updateListDto);
+            if (!success)
             {
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ListExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
             return NoContent();
         }
 
-        // POST: api/Lists
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<List>> PostList(List list)
-        {
-            _context.Lists.Add(list);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetList", new { id = list.Id }, list);
-        }
-
-        // DELETE: api/Lists/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteList(int id)
         {
-            var list = await _context.Lists.FindAsync(id);
-            if (list == null)
+            var success = await _listService.DeleteListAsync(id);
+            if (!success)
             {
                 return NotFound();
             }
-
-            _context.Lists.Remove(list);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool ListExists(int id)
-        {
-            return _context.Lists.Any(e => e.Id == id);
         }
     }
 }

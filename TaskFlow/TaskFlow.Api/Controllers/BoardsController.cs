@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TaskFlow.Api.Data;
 using TaskFlow.Api.DTOs;
 using TaskFlow.Api.Models;
+using TaskFlow.Api.Services;
 
 namespace TaskFlow.Api.Controllers
 {
@@ -10,99 +9,33 @@ namespace TaskFlow.Api.Controllers
     [ApiController]
     public class BoardsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IBoardService _boardService;
 
-        public BoardsController(ApplicationDbContext context)
+        public BoardsController(IBoardService boardService)
         {
-            _context = context;
+            _boardService = boardService;
         }
 
         // GET: api/Boards
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Board>>> GetBoards()
         {
-            return await _context.Boards.ToListAsync();
+            var boards = await _boardService.GetAllBoardsAsync();
+            return Ok(boards);
         }
 
         // GET: api/Boards/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Board>> GetBoard(int id)
+        public async Task<ActionResult<BoardDto>> GetBoard(int id)
         {
-            var board = await _context.Boards.FindAsync(id);
-
-            if (board == null)
-            {
-                return NotFound();
-            }
-
-            return board;
-        }
-
-        // PUT: api/Boards/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutBoard(int id, Board board)
-        {
-            if (id != board.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(board).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BoardExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return await _boardService.GetBoardByIdAsync(id);
         }
 
         // POST: api/Boards
         [HttpPost]
-        public async Task<ActionResult<Board>> PostBoard(CreateBoardDto createBoardDto) // Renamed for clarity
+        public async Task<ActionResult<Board>> PostBoard(CreateBoardDto createBoardDto)
         {
-            var board = new Board
-            {
-                Title = createBoardDto.Title
-            };
-
-            _context.Boards.Add(board);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetBoard", new { id = board.Id }, board);
-        }
-
-        // DELETE: api/Boards/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBoard(int id)
-        {
-            var board = await _context.Boards.FindAsync(id);
-            if (board == null)
-            {
-                return NotFound();
-            }
-
-            _context.Boards.Remove(board);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool BoardExists(int id)
-        {
-            return _context.Boards.Any(e => e.Id == id);
+            return await _boardService.CreateBoardAsync(createBoardDto);
         }
     }
 }

@@ -68,3 +68,40 @@ h1 {
 .add-board-form button:hover {
   background-color: #0056b3;
 }
+
+.board-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.board-page-container {
+  padding: 20px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.lists-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 20px;
+}
+
+.list {
+  background-color: #ebecf0;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 270px;
+  flex-shrink: 0;
+}
+
+.list h3 {
+  margin: 0 0 10px 0;
+  padding: 0 5px;
+}
