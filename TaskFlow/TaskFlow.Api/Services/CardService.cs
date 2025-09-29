@@ -72,5 +72,21 @@ namespace TaskFlow.Api.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<bool> MoveCardAsync(int cardId, int newListId)
+        {
+            var card = await _context.Cards.FindAsync(cardId);
+            var newList = await _context.Lists.FindAsync(newListId);
+
+            if (card == null || newList == null)
+            {
+                return false;
+            }
+
+            card.ListId = newListId;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

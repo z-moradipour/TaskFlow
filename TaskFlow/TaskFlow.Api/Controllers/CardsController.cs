@@ -61,5 +61,16 @@ namespace TaskFlow.Api.Controllers
             }
             return NoContent();
         }
+
+        [HttpPut("{cardId}/move")]
+        public async Task<IActionResult> MoveCard(int cardId, [FromBody] int newListId)
+        {
+            var success = await _cardService.MoveCardAsync(cardId, newListId);
+            if (!success)
+            {
+                return NotFound();
+            }
+            return NoContent();
+        }
     }
 }
