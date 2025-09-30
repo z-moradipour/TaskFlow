@@ -22,20 +22,19 @@ namespace TaskFlow.Api.Services
 
         public async Task<ActionResult<BoardDto>> GetBoardByIdAsync(int id)
         {
-            var board = await _context.Boards
-                .Include(b => b.Lists)
-                .ThenInclude(l => l.Cards)
+            var boardDto = await _context.Boards
                 .Where(b => b.Id == id)
                 .Select(b => new BoardDto
                 {
                     Id = b.Id,
                     Title = b.Title,
-                    Lists = b.Lists.Select(l => new ListDto
+                    Lists = b.Lists.OrderBy(l => l.Position).Select(l => new ListDto
                     {
                         Id = l.Id,
                         Title = l.Title,
                         Position = l.Position,
-                        Cards = l.Cards.Select(c => new CardDto
+                        // Make sure the cards within each list are ordered
+                        Cards = l.Cards.OrderBy(c => c.Position).Select(c => new CardDto
                         {
                             Id = c.Id,
                             Title = c.Title,
@@ -46,14 +45,13 @@ namespace TaskFlow.Api.Services
                 })
                 .FirstOrDefaultAsync();
 
-            if (board == null)
+            if (boardDto == null)
             {
                 return new NotFoundResult();
             }
 
-            return board;
+            return boardDto;
         }
-
         public async Task<ActionResult<Board>> CreateBoardAsync(CreateBoardDto createBoardDto)
         {
             var board = new Board

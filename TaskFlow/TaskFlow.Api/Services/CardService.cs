@@ -72,21 +72,33 @@ namespace TaskFlow.Api.Services
             await _context.SaveChangesAsync();
             return true;
         }
-
-        public async Task<bool> MoveCardAsync(int cardId, int newListId)
+        public async Task ReorderCardsAsync(int listId, List<int> orderedCardIds)
         {
-            var card = await _context.Cards.FindAsync(cardId);
-            var newList = await _context.Lists.FindAsync(newListId);
+            // Fetch only the cards that are relevant to this operation.
+            var cardsToUpdate = await _context.Cards
+                .Where(c => c.ListId == listId || orderedCardIds.Contains(c.Id))
+                .ToListAsync();
 
-            if (card == null || newList == null)
+            // Loop through the cards we found and update them.
+            foreach (var card in cardsToUpdate)
             {
-                return false;
+                int newPosition = orderedCardIds.IndexOf(card.Id);
+
+                if (newPosition == -1) // Card is no longer in this list
+                {
+                    if (card.ListId == listId)
+                    {
+                        // This case is handled by the API call for the other list
+                    }
+                }
+                else // Card is in this list
+                {
+                    card.ListId = listId;
+                    card.Position = newPosition;
+                }
             }
 
-            card.ListId = newListId;
-
             await _context.SaveChangesAsync();
-            return true;
         }
     }
 }

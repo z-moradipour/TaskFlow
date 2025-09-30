@@ -62,14 +62,10 @@ namespace TaskFlow.Api.Controllers
             return NoContent();
         }
 
-        [HttpPut("{cardId}/move")]
-        public async Task<IActionResult> MoveCard(int cardId, [FromBody] int newListId)
+        [HttpPut("reorder/{listId}")]
+        public async Task<IActionResult> ReorderCards(int listId, [FromBody] ReorderCardsDto reorderDto)
         {
-            var success = await _cardService.MoveCardAsync(cardId, newListId);
-            if (!success)
-            {
-                return NotFound();
-            }
+            await _cardService.ReorderCardsAsync(listId, reorderDto.OrderedCardIds);
             return NoContent();
         }
     }

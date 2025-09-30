@@ -11,6 +11,6 @@ namespace TaskFlow.Api.Services
         Task<Card> CreateCardAsync(int listId, CreateCardDto createCardDto);
         Task<bool> UpdateCardAsync(int cardId, UpdateCardDto updateCardDto);
         Task<bool> DeleteCardAsync(int cardId);
-        Task<bool> MoveCardAsync(int cardId, int newListId);
+        Task ReorderCardsAsync(int listId, List<int> orderedCardIds);
     }
 }

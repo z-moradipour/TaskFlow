@@ -18,13 +18,13 @@ namespace TaskFlow.Api.Services
         {
             return await _context.Lists
                 .Where(l => l.BoardId == boardId)
-                .OrderBy(l => l.Position)
+                .OrderBy(l => l.Position) // Order the lists
                 .Select(l => new ListDto
                 {
                     Id = l.Id,
                     Title = l.Title,
                     Position = l.Position,
-                    Cards = l.Cards.OrderBy(c => c.Position).Select(c => new CardDto
+                    Cards = l.Cards.OrderBy(c => c.Position).Select(c => new CardDto // Order the cards
                     {
                         Id = c.Id,
                         Title = c.Title,
