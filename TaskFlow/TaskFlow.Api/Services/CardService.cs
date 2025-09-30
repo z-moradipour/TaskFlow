@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TaskFlow.Api.Data;
 using TaskFlow.Api.DTOs;
 using TaskFlow.Api.Models;
@@ -29,9 +30,24 @@ namespace TaskFlow.Api.Services
                 .ToListAsync();
         }
 
-        public async Task<Card?> GetCardByIdAsync(int cardId)
+        public async Task<ActionResult<CardDto>> GetCardByIdAsync(int cardId)
         {
-            return await _context.Cards.FindAsync(cardId);
+            var card = await _context.Cards.FindAsync(cardId);
+
+            if (card == null)
+            {
+                return new NotFoundResult();
+            }
+
+            var cardDto = new CardDto
+            {
+                Id = card.Id,
+                Title = card.Title,
+                Description = card.Description,
+                Position = card.Position
+            };
+
+            return cardDto;
         }
 
         public async Task<Card> CreateCardAsync(int listId, CreateCardDto createCardDto)

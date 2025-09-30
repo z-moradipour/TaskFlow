@@ -23,14 +23,9 @@ namespace TaskFlow.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCard(int id)
+        public async Task<ActionResult<CardDto>> GetCard(int id)
         {
-            var card = await _cardService.GetCardByIdAsync(id);
-            if (card == null)
-            {
-                return NotFound();
-            }
-            return Ok(card);
+            return await _cardService.GetCardByIdAsync(id);
         }
 
         [HttpPost("list/{listId}")]
