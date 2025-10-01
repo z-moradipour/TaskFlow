@@ -18,6 +18,8 @@ export function DraggableCard({ card, onCardClick }) {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  // The outer div is for the dnd-kit library to control.
+  // The inner div receives the click event.
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
         <div onClick={() => onCardClick(card)} className="card">

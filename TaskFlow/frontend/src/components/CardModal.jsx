@@ -6,6 +6,7 @@ const customStyles = {
     top: '50%', left: '50%', right: 'auto', bottom: 'auto',
     marginRight: '-50%', transform: 'translate(-50%, -50%)',
     width: '500px',
+    padding: '20px'
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.75)'
@@ -14,7 +15,7 @@ const customStyles = {
 
 Modal.setAppElement('#root');
 
-function CardModal({ isOpen, onRequestClose, card, onSave }) {
+function CardModal({ isOpen, onRequestClose, card, onSave, onDelete }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
@@ -27,6 +28,12 @@ function CardModal({ isOpen, onRequestClose, card, onSave }) {
 
   const handleSave = () => {
     onSave({ ...card, title, description });
+  };
+  
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete the card "${card.title}"?`)) {
+        onDelete(card.id);
+    }
   };
 
   if (!card) return null;
@@ -45,14 +52,18 @@ function CardModal({ isOpen, onRequestClose, card, onSave }) {
           onChange={(e) => setTitle(e.target.value)} 
           className="card-modal-title-input"
         />
-        <p>Description</p>
+        <p className="card-modal-section-title">Description</p>
         <textarea 
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Add a more detailed description..."
           className="card-modal-desc-textarea"
         ></textarea>
-        <button onClick={handleSave} className="card-modal-save-btn">Save</button>
+        <div className="card-modal-actions">
+            <button onClick={handleSave} className="card-modal-save-btn">Save</button>
+            {}
+            <button onClick={handleDelete} className="card-modal-delete-btn">Delete Card</button>
+        </div>
       </div>
     </Modal>
   );

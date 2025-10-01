@@ -237,3 +237,45 @@ h1 {
   resize: vertical;
   box-sizing: border-box; 
 }
+
+.card-modal-section-title {
+  margin-top: 20px;
+  margin-bottom: 5px;
+  color: #5e6c84;
+  font-weight: bold;
+}
+
+.card-modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end; /* Aligns buttons to the right */
+  gap: 10px;
+}
+
+.card-modal-delete-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  background-color: #dc3545; /* A standard red color for delete buttons */
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.card-modal-delete-btn:hover {
+  background-color: #c82333;
+}
+
+.list-title-input {
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 4px 6px;
+  border: 2px solid #007bff;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.list-title-input:focus {
+  outline: none;
+}

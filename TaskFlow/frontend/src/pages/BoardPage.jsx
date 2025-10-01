@@ -3,10 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { DndContext, DragOverlay, closestCorners, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import ListComponent from './../components/ListComponent.jsx';
-import CardModal from './../components/CardModal.jsx';
-import { DraggableCard } from './../components/DraggableCard.jsx';
-import './../App.css';
+import ListComponent from '../components/ListComponent.jsx';
+import CardModal from '../components/CardModal.jsx';
+import { DraggableCard } from '../components/DraggableCard.jsx';
+import '../App.css';
 
 function BoardPage() {
     const { boardId } = useParams();
@@ -15,12 +15,8 @@ function BoardPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [newListTitle, setNewListTitle] = useState('');
-
-    // State for the card modal
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
-
-    // State for the drag-and-drop overlay
     const [activeCard, setActiveCard] = useState(null);
 
     const sensors = useSensors(
@@ -60,14 +56,16 @@ function BoardPage() {
     };
 
     const handleDeleteList = async (listId) => {
-        try {
-            await axios.delete(`https://localhost:7289/api/Lists/${listId}`);
-            setLists(lists.filter(list => list.id !== listId));
-        } catch (err) {
-            console.error("Error deleting list:", err);
+        if (window.confirm("Are you sure you want to delete this list and all its cards?")) {
+            try {
+                await axios.delete(`https://localhost:7289/api/Lists/${listId}`);
+                setLists(lists.filter(list => list.id !== listId));
+            } catch (err) {
+                console.error("Error deleting list:", err);
+            }
         }
     };
-    
+
     const openCardModal = (card) => {
         setSelectedCard(card);
         setIsModalOpen(true);
@@ -80,7 +78,10 @@ function BoardPage() {
 
     const handleSaveCard = async (updatedCard) => {
         try {
-            const updateDto = { title: updatedCard.title, description: updatedCard.description };
+            const updateDto = {
+                title: updatedCard.title,
+                description: updatedCard.description,
+            };
             await axios.put(`https://localhost:7289/api/Cards/${updatedCard.id}`, updateDto);
             setLists(prevLists => 
                 prevLists.map(list => ({
@@ -93,6 +94,21 @@ function BoardPage() {
             closeCardModal();
         } catch (error) {
             console.error("Failed to save card:", error);
+        }
+    };
+
+    const handleDeleteCard = async (cardIdToDelete) => {
+        try {
+            await axios.delete(`https://localhost:7289/api/Cards/${cardIdToDelete}`);
+            setLists(prevLists => 
+                prevLists.map(list => ({
+                    ...list,
+                    cards: list.cards.filter(card => card.id !== cardIdToDelete)
+                }))
+            );
+            closeCardModal();
+        } catch (error) {
+            console.error("Failed to delete card:", error);
         }
     };
 
@@ -111,18 +127,14 @@ function BoardPage() {
     function handleDragEnd(event) {
         const { active, over } = event;
         setActiveCard(null);
-
         if (!over || active.id === over.id) return;
 
-        const activeId = active.id;
-        const overId = over.id;
-
         setLists((prevLists) => {
-            const sourceList = prevLists.find(list => list.cards.some(c => `card-${c.id}` === activeId));
-            const destList = prevLists.find(list => `list-${list.id}` === overId || list.cards.some(c => `card-${c.id}` === overId));
+            const sourceList = prevLists.find(list => list.cards.some(c => `card-${c.id}` === active.id));
+            const destList = prevLists.find(list => `list-${list.id}` === over.id || list.cards.some(c => `card-${c.id}` === over.id));
             if (!sourceList || !destList) return prevLists;
 
-            const activeCardId = Number(String(activeId).replace('card-', ''));
+            const activeCardId = Number(String(active.id).replace('card-', ''));
             const [movedCard] = sourceList.cards.filter(c => c.id === activeCardId);
 
             let newLists = JSON.parse(JSON.stringify(prevLists));
@@ -132,16 +144,19 @@ function BoardPage() {
             const sourceCardIndex = sourceListInNewState.cards.findIndex(c => c.id === activeCardId);
             sourceListInNewState.cards.splice(sourceCardIndex, 1);
             
-            const overIsListContainer = overId.toString().startsWith('list-');
-            const overCardIndex = overIsListContainer ? destListInNewState.cards.length : destListInNewState.cards.findIndex(c => `card-${c.id}` === overId);
+            const overIsListContainer = over.id.toString().startsWith('list-');
+            const overCardIndex = overIsListContainer ? destListInNewState.cards.length : destListInNewState.cards.findIndex(c => `card-${c.id}` === over.id);
             destListInNewState.cards.splice(overCardIndex >= 0 ? overCardIndex : destListInNewState.cards.length, 0, movedCard);
 
             if (sourceList.id === destList.id) {
                 const orderedCardIds = destListInNewState.cards.map(c => c.id);
                 axios.put(`https://localhost:7289/api/Cards/reorder/${destList.id}`, { orderedCardIds });
             } else {
-                axios.put(`https://localhost:7289/api/Cards/reorder/${sourceList.id}`, { orderedCardIds: sourceListInNewState.cards.map(c => c.id) });
-                axios.put(`https://localhost:7289/api/Cards/reorder/${destList.id}`, { orderedCardIds: destListInNewState.cards.map(c => c.id) });
+                const sourceCardIds = sourceListInNewState.cards.map(c => c.id);
+                axios.put(`https://localhost:7289/api/Cards/reorder/${sourceList.id}`, { orderedCardIds: sourceCardIds });
+                
+                const destCardIds = destListInNewState.cards.map(c => c.id);
+                axios.put(`https://localhost:7289/api/Cards/reorder/${destList.id}`, { orderedCardIds: destCardIds });
             }
             
             return newLists;
@@ -189,6 +204,7 @@ function BoardPage() {
                 onRequestClose={closeCardModal}
                 card={selectedCard}
                 onSave={handleSaveCard}
+                onDelete={handleDeleteCard}
             />
             <DragOverlay>
                 {activeCard ? <DraggableCard card={activeCard} /> : null}
@@ -198,4 +214,3 @@ function BoardPage() {
 }
 
 export default BoardPage;
-

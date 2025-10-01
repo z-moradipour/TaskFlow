@@ -7,6 +7,10 @@ import { DraggableCard } from './DraggableCard.jsx';
 function ListComponent({ list, onDeleteList, setLists, onCardClick }) {
   const [newCardTitle, setNewCardTitle] = useState('');
   const { setNodeRef } = useDroppable({ id: `list-${list.id}` });
+  
+  // --- وضعیت‌های محلی جدید برای ویرایش عنوان ---
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(list.title);
 
   const handleCreateCard = async (e) => {
     e.preventDefault();
@@ -29,10 +33,58 @@ function ListComponent({ list, onDeleteList, setLists, onCardClick }) {
     }
   };
 
+  // --- فانکشن جدید برای ذخیره عنوان ویرایش شده ---
+  const handleTitleSave = async () => {
+    if (!editedTitle.trim() || editedTitle === list.title) {
+      setIsEditingTitle(false);
+      setEditedTitle(list.title);
+      return;
+    }
+
+    try {
+      const updateDto = { title: editedTitle };
+      await axios.put(`https://localhost:7289/api/Lists/${list.id}`, updateDto);
+      
+      // آپدیت کردن وضعیت والد (BoardPage)
+      setLists(prevLists => 
+        prevLists.map(l => 
+          l.id === list.id ? { ...l, title: editedTitle } : l
+        )
+      );
+      setIsEditingTitle(false);
+    } catch (error) {
+      console.error("Failed to update list title:", error);
+      // در صورت خطا، به عنوان اصلی برمیگردیم
+      setEditedTitle(list.title);
+      setIsEditingTitle(false);
+    }
+  };
+
+  const handleTitleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleTitleSave();
+    } else if (e.key === 'Escape') {
+      setEditedTitle(list.title);
+      setIsEditingTitle(false);
+    }
+  };
+
   return (
     <div ref={setNodeRef} className="list">
       <div className="list-header">
-        <h3>{list.title}</h3>
+        {isEditingTitle ? (
+          <input
+            type="text"
+            value={editedTitle}
+            onChange={(e) => setEditedTitle(e.target.value)}
+            onBlur={handleTitleSave} // ذخیره هنگام خروج از فوکوس
+            onKeyDown={handleTitleKeyDown} // ذخیره با Enter، لغو با Escape
+            autoFocus // فوکوس خودکار روی اینپوت
+            className="list-title-input"
+          />
+        ) : (
+          <h3 onClick={() => setIsEditingTitle(true)}>{list.title}</h3>
+        )}
         <button onClick={() => onDeleteList(list.id)} className="delete-button">×</button>
       </div>
       <div className="cards-container">
