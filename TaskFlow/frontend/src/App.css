@@ -1,479 +1,482 @@
-/* Basic styles for the whole page */
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: #f4f5f7;
-  color: #172b4d;
-  margin: 0;
-  padding: 20px;
-}
-
-/* Main container for the app */
-.app-container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-/* Container for the boards list */
-.boards-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-/* Styling for a single board */
-.board {
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 15px;
-  min-width: 200px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.board:hover {
-  background-color: #e9ecef;
-}
-
-/* Styling for the new board creation form */
-.add-board-form {
-  margin-bottom: 30px;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-
-.add-board-form input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.add-board-form button {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.add-board-form button:hover {
-  background-color: #0056b3;
-}
-
-.board-link {
-  text-decoration: none;
-  color: inherit;
-}
-
-.board-page-container {
-  padding: 20px;
-}
-
-.back-link {
-  display: inline-block;
-  margin-bottom: 20px;
-  color: #007bff;
-  text-decoration: none;
-}
-
-.lists-container {
-  display: flex;
-  gap: 20px;
-  align-items: flex-start;
-  overflow-x: auto;
-  padding-bottom: 20px;
-}
-
-.list {
-  background-color: #ebecf0;
-  border-radius: 8px;
-  padding: 10px;
-  min-width: 270px;
-  flex-shrink: 0;
-}
-
-.list h3 {
-  margin: 0 0 10px 0;
-  padding: 0 5px;
-}
-
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 5px;
-  margin-bottom: 10px;
-}
-
-.list-header h3 {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.delete-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-  color: #6b778c;
-  padding: 0 5px;
-}
-
-.delete-button:hover {
-  color: #172b4d;
-}
-
-.add-list-form form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.add-list-form input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.add-list-form button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  cursor: pointer;
-}
-
-.cards-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-height: 50px; /* Gives some space for drag-and-drop later */
-}
-
-.card {
-  background-color: #fff;
-  border-radius: 4px;
-  box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-  padding: 10px;
-  font-size: 0.9rem;
-  touch-action: none;
-  user-select: none;
-}
-
-.add-card-form {
-  margin-top: 10px;
-}
-
-.add-card-form input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  margin-bottom: 5px;
-}
-
-.add-card-form button {
-  padding: 6px 10px;
-}
-
-.card-modal {
-  padding: 10px;
-}
-
-.card-modal-save-btn {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  float: right; 
-}
-
-.card-modal-save-btn:hover {
-  background-color: #0056b3;
-}
-
-.card-modal-title-input {
-  font-size: 1.5rem;
-  font-weight: bold;
-  border: none;
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  box-sizing: border-box;
-}
-
-.card-modal {
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-}
-
-.card-modal-desc-textarea {
-  width: 100%;
-  min-height: 150px;
-  border: 1px solid #dfe1e6;
-  border-radius: 4px;
-  padding: 10px;
-  font-family: inherit;
-  font-size: 1rem;
-  margin-bottom: 20px;
-  resize: vertical;
-  box-sizing: border-box; 
-}
-
-.card-modal-section-title {
-  margin-top: 20px;
-  margin-bottom: 5px;
-  color: #5e6c84;
-  font-weight: bold;
-}
-
-.card-modal-actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end; /* Aligns buttons to the right */
-  gap: 10px;
-}
-
-.card-modal-delete-btn {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  background-color: #dc3545; /* A standard red color for delete buttons */
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.card-modal-delete-btn:hover {
-  background-color: #c82333;
-}
-
-.list-title-input {
-  font-size: 1rem;
-  font-weight: bold;
-  padding: 4px 6px;
-  border: 2px solid #007bff;
-  border-radius: 4px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.list-title-input:focus {
-  outline: none;
-}
-
-.auth-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #f4f5f7;
-}
-
-.auth-form {
-  background: white;
-  padding: 40px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-}
-
-.auth-form h2 {
-  margin-bottom: 20px;
-}
-
-.auth-form input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.auth-form button {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.auth-form p {
-  margin-top: 20px;
-}
-
-.error-message {
-  color: #dc3545;
-  margin-bottom: 15px;
-}
-
-.navbar {
-  background-color: #007bff;
-  color: white;
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.navbar-brand {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.navbar-user {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.logout-button {
-  background-color: white;
-  color: #007bff;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.logout-button:hover {
-  background-color: #f0f0f0;
-}
-
-main {
-  padding-top: 20px;
-}
-
-.board-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.share-board-button:hover {
-  background-color: #218838;
-}
-
-.share-modal-content h2 {
-  margin-top: 0;
-}
-
-.share-modal-input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.share-modal-button {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: #007bff;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.success-message {
-  color: #28a745;
-  margin-top: 15px;
-}
-
-.board-page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.board-title-center {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.share-board-button {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.9rem;
-}
-
-.members-list-section {
-  margin-bottom: 20px;
-}
-
-.members-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.members-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 5px;
-  border-bottom: 1px solid #eee;
-}
-
-.members-list li:last-child {
-  border-bottom: none;
-}
-
-.remove-member-button {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-
-.remove-member-button:hover {
-  background-color: #c82333;
-}
-
-hr {
-  border: none;
-  border-top: 1px solid #eee;
-  margin: 20px 0;
-}
+/* =================================
+   Global & Basic Styles
+   ================================= */
+   body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: #f4f5f7; /* Light gray page background */
+    color: #172b4d;
+    margin: 0;
+  }
+  
+  .app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  hr {
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 20px 0;
+  }
+  
+  .error-message {
+    color: #dc3545;
+    margin-bottom: 15px;
+  }
+  
+  .success-message {
+    color: #28a745;
+    margin-top: 15px;
+  }
+  
+  /* =================================
+     Navbar
+     ================================= */
+  .navbar {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .logout-button {
+    background-color: white;
+    color: #007bff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .logout-button:hover {
+    background-color: #f0f0f0;
+  }
+  
+  main {
+    padding-top: 20px;
+  }
+  
+  /* =================================
+     Auth Pages (Login/Register)
+     ================================= */
+  .auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 80px); /* Full height minus navbar */
+  }
+  
+  .auth-form {
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .auth-form h2 {
+    margin-bottom: 20px;
+  }
+  
+  .auth-form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .auth-form button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  .auth-form p {
+    margin-top: 20px;
+  }
+  
+  /* =================================
+     Board List Page
+     ================================= */
+  .boards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  
+  .board {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    min-width: 200px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .board:hover {
+    background-color: #e9ecef;
+  }
+  
+  .add-board-form {
+    margin-bottom: 30px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .add-board-form input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .add-board-form button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .add-board-form button:hover {
+    background-color: #0056b3;
+  }
+  
+  .board-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  /* =================================
+     Board Detail Page
+     ================================= */
+  .board-page-container {
+    padding: 0 20px;
+  }
+  
+  .board-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .back-link {
+    display: inline-block;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .board-title-center {
+    text-align: center;
+    margin: 0;
+    padding-bottom: 20px;
+  }
+  
+  .lists-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    overflow-x: auto;
+    padding: 10px 0 20px 0;
+  }
+  
+  .list {
+    background-color: #dfe1e6; /* Slightly darker gray for better contrast */
+    border-radius: 8px;
+    padding: 10px;
+    min-width: 270px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5px;
+  }
+  
+  .list-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  .list-title-input {
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 4px 6px;
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .list-title-input:focus {
+    outline: none;
+  }
+  
+  .delete-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #6b778c;
+    padding: 0 5px;
+  }
+  
+  .delete-button:hover {
+    color: #172b4d;
+  }
+  
+  .add-list-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .add-list-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  .add-list-form button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+  
+  /* =================================
+     Card Styles
+     ================================= */
+  .cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 20px;
+  }
+  
+  .card {
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    padding: 10px;
+    font-size: 0.9rem;
+    touch-action: none;
+    user-select: none;
+    cursor: pointer;
+  }
+  
+  .add-card-form {
+    margin-top: auto;
+  }
+  
+  .add-card-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+  }
+  
+  .add-card-form button {
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff; /* Primary blue */
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .add-card-form button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* =================================
+     Modal Styles
+     ================================= */
+  
+  /* --- Card Edit Modal --- */
+  .card-modal {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+  
+  .card-modal-title-input {
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+  }
+  .card-modal-title-input:focus {
+    outline: 2px solid #007bff;
+    border-radius: 4px;
+  }
+  
+  .card-modal-desc-textarea {
+    width: 100%;
+    min-height: 150px;
+    border: 1px solid #dfe1e6;
+    border-radius: 4px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    resize: vertical;
+    box-sizing: border-box; 
+  }
+  
+  .card-modal-section-title {
+    margin-bottom: 5px;
+    color: #5e6c84;
+    font-weight: bold;
+  }
+  
+  .card-modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .card-modal-save-btn,
+  .card-modal-delete-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .card-modal-save-btn { background-color: #007bff; }
+  .card-modal-save-btn:hover { background-color: #0056b3; }
+  .card-modal-delete-btn { background-color: #dc3545; }
+  .card-modal-delete-btn:hover { background-color: #c82333; }
+  
+  /* --- Share Board Modal --- */
+  .share-board-button {
+    background-color: #6c757d; /* Neutral gray */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+  }
+  .share-board-button:hover {
+    background-color: #5a6268;
+  }
+  
+  .share-modal-content h2 {
+    margin-top: 0;
+  }
+  
+  .share-modal-input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .share-modal-button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  .members-list-section {
+    margin-bottom: 20px;
+  }
+  
+  .members-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+  
+  .members-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 5px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .members-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .remove-member-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  
+  .remove-member-button:hover {
+    background-color: #c82333;
+  }
