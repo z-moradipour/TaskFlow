@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from './api/axiosConfig.js';
 import './App.css';
 import BoardList from './components/BoardList.jsx';
 import AddBoardForm from './components/AddBoardForm.jsx';
@@ -10,7 +10,7 @@ function App() {
   useEffect(() => {
     const fetchBoards = async () => {
       try {
-        const response = await axios.get('https://localhost:7289/api/Boards');
+        const response = await api.get('https://localhost:7289/api/Boards');
         setBoards(response.data);
       } catch (error) {
         console.error("There was an error fetching the boards:", error);
@@ -22,7 +22,7 @@ function App() {
   const handleCreateBoard = async (title) => {
     try {
       const newBoard = { title };
-      const response = await axios.post('https://localhost:7289/api/Boards', newBoard);
+      const response = await api.post('https://localhost:7289/api/Boards', newBoard);
       setBoards([...boards, response.data]);
     } catch (error) {
       console.error("There was an error creating the board:", error);

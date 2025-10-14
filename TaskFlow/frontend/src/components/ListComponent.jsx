@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../api/axiosConfig.js';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { DraggableCard } from './DraggableCard.jsx';
@@ -8,7 +8,6 @@ function ListComponent({ list, onDeleteList, setLists, onCardClick }) {
   const [newCardTitle, setNewCardTitle] = useState('');
   const { setNodeRef } = useDroppable({ id: `list-${list.id}` });
   
-  // --- وضعیت‌های محلی جدید برای ویرایش عنوان ---
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(list.title);
 
@@ -18,7 +17,7 @@ function ListComponent({ list, onDeleteList, setLists, onCardClick }) {
 
     try {
       const newCardDto = { title: newCardTitle };
-      const response = await axios.post(`https://localhost:7289/api/Cards/list/${list.id}`, newCardDto);
+      const response = await api.post(`https://localhost:7289/api/Cards/list/${list.id}`, newCardDto);
       
       setLists(prevLists =>
         prevLists.map(l =>
@@ -33,7 +32,6 @@ function ListComponent({ list, onDeleteList, setLists, onCardClick }) {
     }
   };
 
-  // --- فانکشن جدید برای ذخیره عنوان ویرایش شده ---
   const handleTitleSave = async () => {
     if (!editedTitle.trim() || editedTitle === list.title) {
       setIsEditingTitle(false);
@@ -43,9 +41,8 @@ function ListComponent({ list, onDeleteList, setLists, onCardClick }) {
 
     try {
       const updateDto = { title: editedTitle };
-      await axios.put(`https://localhost:7289/api/Lists/${list.id}`, updateDto);
+      await api.put(`https://localhost:7289/api/Lists/${list.id}`, updateDto);
       
-      // آپدیت کردن وضعیت والد (BoardPage)
       setLists(prevLists => 
         prevLists.map(l => 
           l.id === list.id ? { ...l, title: editedTitle } : l
@@ -54,7 +51,6 @@ function ListComponent({ list, onDeleteList, setLists, onCardClick }) {
       setIsEditingTitle(false);
     } catch (error) {
       console.error("Failed to update list title:", error);
-      // در صورت خطا، به عنوان اصلی برمیگردیم
       setEditedTitle(list.title);
       setIsEditingTitle(false);
     }
@@ -77,9 +73,9 @@ function ListComponent({ list, onDeleteList, setLists, onCardClick }) {
             type="text"
             value={editedTitle}
             onChange={(e) => setEditedTitle(e.target.value)}
-            onBlur={handleTitleSave} // ذخیره هنگام خروج از فوکوس
-            onKeyDown={handleTitleKeyDown} // ذخیره با Enter، لغو با Escape
-            autoFocus // فوکوس خودکار روی اینپوت
+            onBlur={handleTitleSave}
+            onKeyDown={handleTitleKeyDown}
+            autoFocus
             className="list-title-input"
           />
         ) : (

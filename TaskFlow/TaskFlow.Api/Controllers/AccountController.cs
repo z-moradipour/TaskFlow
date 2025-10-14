@@ -12,13 +12,11 @@ namespace TaskFlow.Api.Controllers
     public class AccountController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
-        private readonly SignInManager<User> _signInManager;
         private readonly ITokenService _tokenService;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, ITokenService tokenService)
+        public AccountController(UserManager<User> userManager, ITokenService tokenService)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _tokenService = tokenService;
         }
 
@@ -30,39 +28,23 @@ namespace TaskFlow.Api.Controllers
                 return BadRequest("Username is already taken");
             }
 
-            var user = new User
-            {
-                UserName = registerDto.Username.ToLower(),
-                Email = registerDto.Email
-            };
-
+            var user = new User { UserName = registerDto.Username.ToLower(), Email = registerDto.Email };
             var result = await _userManager.CreateAsync(user, registerDto.Password);
-
             if (!result.Succeeded) return BadRequest(result.Errors);
 
-            return new UserDto
-            {
-                Username = user.UserName,
-                Token = _tokenService.CreateToken(user)
-            };
+            return new UserDto { Username = user.UserName, Token = _tokenService.CreateToken(user) };
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {
             var user = await _userManager.FindByNameAsync(loginDto.Username.ToLower());
-
-            if (user == null) return Unauthorized("Invalid username");
-
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-
-            if (!result.Succeeded) return Unauthorized("Invalid password");
-
-            return new UserDto
+            if (user == null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
             {
-                Username = user.UserName,
-                Token = _tokenService.CreateToken(user)
-            };
+                return Unauthorized("Invalid username or password");
+            }
+
+            return new UserDto { Username = user.UserName, Token = _tokenService.CreateToken(user) };
         }
     }
 }

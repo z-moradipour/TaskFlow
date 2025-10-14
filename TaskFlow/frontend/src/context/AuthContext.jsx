@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
-import axios from 'axios';
+import api from '../api/axiosConfig.js';
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext(null);
@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         try {
-            const response = await axios.post('https://localhost:7289/api/account/login', { username, password });
+            const response = await api.post('https://localhost:7289/api/account/login', { username, password });
             setUser(response.data);
             localStorage.setItem('user', JSON.stringify(response.data));
             navigate('/'); 
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (email, username, password) => {
         try {
-            const response = await axios.post('https://localhost:7289/api/account/register', { email, username, password });
+            const response = await api.post('https://localhost:7289/api/account/register', { email, username, password });
             setUser(response.data);
             localStorage.setItem('user', JSON.stringify(response.data));
             navigate('/');

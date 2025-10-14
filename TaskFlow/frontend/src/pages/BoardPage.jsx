@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api/axiosConfig.js';
 import { DndContext, DragOverlay, closestCorners, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import ListComponent from '../components/ListComponent.jsx';
@@ -29,7 +29,7 @@ function BoardPage() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const boardResponse = await axios.get(`https://localhost:7289/api/Boards/${boardId}`);
+                const boardResponse = await api.get(`https://localhost:7289/api/Boards/${boardId}`);
                 setBoard(boardResponse.data);
                 setLists(boardResponse.data.lists || []);
             } catch (err) {
@@ -47,7 +47,7 @@ function BoardPage() {
         if (!newListTitle.trim()) return;
         try {
             const newListDto = { title: newListTitle };
-            const response = await axios.post(`https://localhost:7289/api/Lists/board/${boardId}`, newListDto);
+            const response = await api.post(`https://localhost:7289/api/Lists/board/${boardId}`, newListDto);
             setLists([...lists, { ...response.data, cards: [] }]);
             setNewListTitle('');
         } catch (err) {
@@ -58,7 +58,7 @@ function BoardPage() {
     const handleDeleteList = async (listId) => {
         if (window.confirm("Are you sure you want to delete this list and all its cards?")) {
             try {
-                await axios.delete(`https://localhost:7289/api/Lists/${listId}`);
+                await api.delete(`https://localhost:7289/api/Lists/${listId}`);
                 setLists(lists.filter(list => list.id !== listId));
             } catch (err) {
                 console.error("Error deleting list:", err);
@@ -82,7 +82,7 @@ function BoardPage() {
                 title: updatedCard.title,
                 description: updatedCard.description,
             };
-            await axios.put(`https://localhost:7289/api/Cards/${updatedCard.id}`, updateDto);
+            await api.put(`https://localhost:7289/api/Cards/${updatedCard.id}`, updateDto);
             setLists(prevLists => 
                 prevLists.map(list => ({
                     ...list,
@@ -99,7 +99,7 @@ function BoardPage() {
 
     const handleDeleteCard = async (cardIdToDelete) => {
         try {
-            await axios.delete(`https://localhost:7289/api/Cards/${cardIdToDelete}`);
+            await api.delete(`https://localhost:7289/api/Cards/${cardIdToDelete}`);
             setLists(prevLists => 
                 prevLists.map(list => ({
                     ...list,
@@ -150,13 +150,13 @@ function BoardPage() {
 
             if (sourceList.id === destList.id) {
                 const orderedCardIds = destListInNewState.cards.map(c => c.id);
-                axios.put(`https://localhost:7289/api/Cards/reorder/${destList.id}`, { orderedCardIds });
+                api.put(`https://localhost:7289/api/Cards/reorder/${destList.id}`, { orderedCardIds });
             } else {
                 const sourceCardIds = sourceListInNewState.cards.map(c => c.id);
-                axios.put(`https://localhost:7289/api/Cards/reorder/${sourceList.id}`, { orderedCardIds: sourceCardIds });
+                api.put(`https://localhost:7289/api/Cards/reorder/${sourceList.id}`, { orderedCardIds: sourceCardIds });
                 
                 const destCardIds = destListInNewState.cards.map(c => c.id);
-                axios.put(`https://localhost:7289/api/Cards/reorder/${destList.id}`, { orderedCardIds: destCardIds });
+                api.put(`https://localhost:7289/api/Cards/reorder/${destList.id}`, { orderedCardIds: destCardIds });
             }
             
             return newLists;
