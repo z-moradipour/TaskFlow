@@ -369,3 +369,67 @@ h1 {
 main {
   padding-top: 20px;
 }
+
+.board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.share-board-button:hover {
+  background-color: #218838;
+}
+
+.share-modal-content h2 {
+  margin-top: 0;
+}
+
+.share-modal-input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.share-modal-button {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.success-message {
+  color: #28a745;
+  margin-top: 15px;
+}
+
+.board-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.board-title-center {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.share-board-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+}

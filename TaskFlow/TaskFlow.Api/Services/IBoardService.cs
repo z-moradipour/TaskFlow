@@ -9,5 +9,6 @@ namespace TaskFlow.Api.Services
         Task<IEnumerable<Board>> GetAllBoardsAsync();
         Task<ActionResult<BoardDto>> GetBoardByIdAsync(int id);
         Task<ActionResult<Board>> CreateBoardAsync(CreateBoardDto createBoardDto);
+        Task<ActionResult> InviteUserToBoardAsync(int boardId, string usernameToInvite);
     }
 }

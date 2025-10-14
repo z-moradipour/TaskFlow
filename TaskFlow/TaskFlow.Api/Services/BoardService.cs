@@ -44,12 +44,12 @@ namespace TaskFlow.Api.Services
                 return new UnauthorizedResult();
             }
 
-            var hasAccess = await _context.BoardMemberships
-                .AnyAsync(bm => bm.BoardId == id && bm.UserId == CurrentUserId);
+            var membership = await _context.BoardMemberships
+                .FirstOrDefaultAsync(bm => bm.BoardId == id && bm.UserId == CurrentUserId);
 
-            if (!hasAccess)
+            if (membership == null)
             {
-                return new ForbidResult();
+                return new ForbidResult(); // User is not a member, deny access.
             }
 
             var boardDto = await _context.Boards
@@ -70,7 +70,8 @@ namespace TaskFlow.Api.Services
                             Description = c.Description,
                             Position = c.Position
                         }).ToList()
-                    }).ToList()
+                    }).ToList(),
+                    CurrentUserRole = membership.Role.ToString()
                 })
                 .FirstOrDefaultAsync();
 
@@ -107,6 +108,46 @@ namespace TaskFlow.Api.Services
 
             await _context.SaveChangesAsync();
             return new CreatedAtActionResult("GetBoard", "Boards", new { id = board.Id }, board);
+        }
+
+        public async Task<ActionResult> InviteUserToBoardAsync(int boardId, string usernameToInvite)
+        {
+            var currentUserMembership = await _context.BoardMemberships
+                .FirstOrDefaultAsync(bm => bm.BoardId == boardId && bm.UserId == CurrentUserId);
+
+            if (currentUserMembership == null || currentUserMembership.Role != BoardRole.Owner)
+            {
+                // Only the owner can invite others.
+                return new ForbidResult();
+            }
+
+            var userToInvite = await _context.Users
+                .FirstOrDefaultAsync(u => u.UserName.ToLower() == usernameToInvite.ToLower());
+
+            if (userToInvite == null)
+            {
+                return new NotFoundObjectResult($"User '{usernameToInvite}' not found.");
+            }
+
+            var isAlreadyMember = await _context.BoardMemberships
+                .AnyAsync(bm => bm.BoardId == boardId && bm.UserId == userToInvite.Id);
+
+            if (isAlreadyMember)
+            {
+                return new BadRequestObjectResult($"User '{usernameToInvite}' is already a member of this board.");
+            }
+
+            var newMembership = new BoardMembership
+            {
+                BoardId = boardId,
+                UserId = userToInvite.Id,
+                Role = BoardRole.Member // Invited users are members by default.
+            };
+
+            _context.BoardMemberships.Add(newMembership);
+            await _context.SaveChangesAsync();
+
+            return new OkResult();
         }
     }
 }

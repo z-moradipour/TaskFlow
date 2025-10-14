@@ -6,6 +6,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import ListComponent from '../components/ListComponent.jsx';
 import CardModal from '../components/CardModal.jsx';
 import { DraggableCard } from '../components/DraggableCard.jsx';
+import ShareBoardModal from '../components/ShareBoardModal.jsx';
 import '../App.css';
 
 function BoardPage() {
@@ -18,6 +19,7 @@ function BoardPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
     const [activeCard, setActiveCard] = useState(null);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -29,7 +31,7 @@ function BoardPage() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const boardResponse = await api.get(`https://localhost:7289/api/Boards/${boardId}`);
+                const boardResponse = await api.get(`/Boards/${boardId}`);
                 setBoard(boardResponse.data);
                 setLists(boardResponse.data.lists || []);
             } catch (err) {
@@ -47,7 +49,7 @@ function BoardPage() {
         if (!newListTitle.trim()) return;
         try {
             const newListDto = { title: newListTitle };
-            const response = await api.post(`https://localhost:7289/api/Lists/board/${boardId}`, newListDto);
+            const response = await api.post(`/Lists/board/${boardId}`, newListDto);
             setLists([...lists, { ...response.data, cards: [] }]);
             setNewListTitle('');
         } catch (err) {
@@ -58,7 +60,7 @@ function BoardPage() {
     const handleDeleteList = async (listId) => {
         if (window.confirm("Are you sure you want to delete this list and all its cards?")) {
             try {
-                await api.delete(`https://localhost:7289/api/Lists/${listId}`);
+                await api.delete(`/Lists/${listId}`);
                 setLists(lists.filter(list => list.id !== listId));
             } catch (err) {
                 console.error("Error deleting list:", err);
@@ -78,11 +80,8 @@ function BoardPage() {
 
     const handleSaveCard = async (updatedCard) => {
         try {
-            const updateDto = {
-                title: updatedCard.title,
-                description: updatedCard.description,
-            };
-            await api.put(`https://localhost:7289/api/Cards/${updatedCard.id}`, updateDto);
+            const updateDto = { title: updatedCard.title, description: updatedCard.description };
+            await api.put(`/Cards/${updatedCard.id}`, updateDto);
             setLists(prevLists => 
                 prevLists.map(list => ({
                     ...list,
@@ -99,7 +98,7 @@ function BoardPage() {
 
     const handleDeleteCard = async (cardIdToDelete) => {
         try {
-            await api.delete(`https://localhost:7289/api/Cards/${cardIdToDelete}`);
+            await api.delete(`/Cards/${cardIdToDelete}`);
             setLists(prevLists => 
                 prevLists.map(list => ({
                     ...list,
@@ -111,7 +110,7 @@ function BoardPage() {
             console.error("Failed to delete card:", error);
         }
     };
-
+        
     function handleDragStart(event) {
         const { active } = event;
         const cardId = Number(active.id.toString().replace('card-', ''));
@@ -128,7 +127,7 @@ function BoardPage() {
         const { active, over } = event;
         setActiveCard(null);
         if (!over || active.id === over.id) return;
-
+        
         setLists((prevLists) => {
             const sourceList = prevLists.find(list => list.cards.some(c => `card-${c.id}` === active.id));
             const destList = prevLists.find(list => `list-${list.id}` === over.id || list.cards.some(c => `card-${c.id}` === over.id));
@@ -150,18 +149,21 @@ function BoardPage() {
 
             if (sourceList.id === destList.id) {
                 const orderedCardIds = destListInNewState.cards.map(c => c.id);
-                api.put(`https://localhost:7289/api/Cards/reorder/${destList.id}`, { orderedCardIds });
+                api.put(`/Cards/reorder/${destList.id}`, { orderedCardIds });
             } else {
                 const sourceCardIds = sourceListInNewState.cards.map(c => c.id);
-                api.put(`https://localhost:7289/api/Cards/reorder/${sourceList.id}`, { orderedCardIds: sourceCardIds });
+                api.put(`/Cards/reorder/${sourceList.id}`, { orderedCardIds: sourceCardIds });
                 
                 const destCardIds = destListInNewState.cards.map(c => c.id);
-                api.put(`https://localhost:7289/api/Cards/reorder/${destList.id}`, { orderedCardIds: destCardIds });
+                api.put(`/Cards/reorder/${destList.id}`, { orderedCardIds: destCardIds });
             }
             
             return newLists;
         });
     }
+
+    const openShareModal = () => setIsShareModalOpen(true);
+    const closeShareModal = () => setIsShareModalOpen(false);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
@@ -174,8 +176,18 @@ function BoardPage() {
             collisionDetection={closestCorners}
         >
             <div className="board-page-container">
-                <Link to="/" className="back-link">← Back to Boards</Link>
-                <h1>{board?.title}</h1>
+                <div className="board-page-header">
+                    <Link to="/" className="back-link">← Back to Boards</Link>
+                    
+                    {board?.currentUserRole === 'Owner' && (
+                        <button onClick={openShareModal} className="share-board-button">
+                            Share
+                        </button>
+                    )}
+                </div>
+                
+                <h1 className="board-title-center">{board?.title}</h1>
+
                 <div className="lists-container">
                     {lists.map(list => (
                         <ListComponent
@@ -199,6 +211,11 @@ function BoardPage() {
                     </div>
                 </div>
             </div>
+            <ShareBoardModal 
+                isOpen={isShareModalOpen}
+                onRequestClose={closeShareModal}
+                boardId={boardId}
+            />
             <CardModal 
                 isOpen={isModalOpen}
                 onRequestClose={closeCardModal}
