@@ -37,5 +37,24 @@ namespace TaskFlow.Api.Controllers
 
             return Ok("User successfully invited to the board.");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetMembers(int boardId)
+        {
+            var result = await _boardService.GetBoardMembersAsync(boardId);
+            if (result.Result is ForbidResult) return Forbid();
+            return Ok(result.Value);
+        }
+
+        [HttpDelete("{userId}")]
+        public async Task<IActionResult> RemoveMember(int boardId, string userId)
+        {
+            var result = await _boardService.RemoveUserFromBoardAsync(boardId, userId);
+            if (result is ForbidResult) return Forbid("Only the board owner can remove members.");
+            if (result is NotFoundResult) return NotFound("Member not found on this board.");
+            if (result is BadRequestObjectResult badRequest) return BadRequest(badRequest.Value);
+
+            return NoContent();
+        }
     }
 }

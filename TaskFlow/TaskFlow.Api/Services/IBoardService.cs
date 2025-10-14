@@ -10,5 +10,7 @@ namespace TaskFlow.Api.Services
         Task<ActionResult<BoardDto>> GetBoardByIdAsync(int id);
         Task<ActionResult<Board>> CreateBoardAsync(CreateBoardDto createBoardDto);
         Task<ActionResult> InviteUserToBoardAsync(int boardId, string usernameToInvite);
+        Task<ActionResult<IEnumerable<BoardMemberDto>>> GetBoardMembersAsync(int boardId);
+        Task<ActionResult> RemoveUserFromBoardAsync(int boardId, string userIdToRemove);
     }
 }

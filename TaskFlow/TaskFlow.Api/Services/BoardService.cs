@@ -149,5 +149,58 @@ namespace TaskFlow.Api.Services
 
             return new OkResult();
         }
+
+        public async Task<ActionResult<IEnumerable<BoardMemberDto>>> GetBoardMembersAsync(int boardId)
+        {
+            var hasAccess = await _context.BoardMemberships
+                .AnyAsync(bm => bm.BoardId == boardId && bm.UserId == CurrentUserId);
+
+            if (!hasAccess)
+            {
+                return new ForbidResult(); // Deny access if not a member.
+            }
+
+            return await _context.BoardMemberships
+                .Where(bm => bm.BoardId == boardId)
+                .Include(bm => bm.User)
+                .Select(bm => new BoardMemberDto
+                {
+                    UserId = bm.UserId,
+                    Username = bm.User.UserName,
+                    Role = bm.Role.ToString()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<ActionResult> RemoveUserFromBoardAsync(int boardId, string userIdToRemove)
+        {
+            // Only owners can remove members.
+            var currentUserMembership = await _context.BoardMemberships
+                .FirstOrDefaultAsync(bm => bm.BoardId == boardId && bm.UserId == CurrentUserId);
+
+            if (currentUserMembership == null || currentUserMembership.Role != BoardRole.Owner)
+            {
+                return new ForbidResult();
+            }
+
+            var membershipToRemove = await _context.BoardMemberships
+                .FirstOrDefaultAsync(bm => bm.BoardId == boardId && bm.UserId == userIdToRemove);
+
+            if (membershipToRemove == null)
+            {
+                return new NotFoundResult();
+            }
+
+            // Prevent the owner from removing themselves.
+            if (membershipToRemove.Role == BoardRole.Owner)
+            {
+                return new BadRequestObjectResult("The owner of a board cannot be removed.");
+            }
+
+            _context.BoardMemberships.Remove(membershipToRemove);
+            await _context.SaveChangesAsync();
+
+            return new NoContentResult();
+        }
     }
 }

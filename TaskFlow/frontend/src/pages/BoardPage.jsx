@@ -215,6 +215,7 @@ function BoardPage() {
                 isOpen={isShareModalOpen}
                 onRequestClose={closeShareModal}
                 boardId={boardId}
+                currentUserRole={board?.currentUserRole} 
             />
             <CardModal 
                 isOpen={isModalOpen}

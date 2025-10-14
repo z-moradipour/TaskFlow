@@ -433,3 +433,47 @@ main {
   font-weight: bold;
   font-size: 0.9rem;
 }
+
+.members-list-section {
+  margin-bottom: 20px;
+}
+
+.members-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.members-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 5px;
+  border-bottom: 1px solid #eee;
+}
+
+.members-list li:last-child {
+  border-bottom: none;
+}
+
+.remove-member-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.remove-member-button:hover {
+  background-color: #c82333;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 20px 0;
+}
