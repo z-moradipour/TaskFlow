@@ -7,6 +7,7 @@ import ListComponent from '../components/ListComponent.jsx';
 import CardModal from '../components/CardModal.jsx';
 import { DraggableCard } from '../components/DraggableCard.jsx';
 import ShareBoardModal from '../components/ShareBoardModal.jsx';
+import ActivityLogPanel from '../components/ActivityLogPanel.jsx'; 
 import '../App.css';
 
 function BoardPage() {
@@ -20,6 +21,8 @@ function BoardPage() {
     const [selectedCard, setSelectedCard] = useState(null);
     const [activeCard, setActiveCard] = useState(null);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [activities, setActivities] = useState([]);
+    const [isActivityLogOpen, setIsActivityLogOpen] = useState(false);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -34,6 +37,8 @@ function BoardPage() {
                 const boardResponse = await api.get(`/Boards/${boardId}`);
                 setBoard(boardResponse.data);
                 setLists(boardResponse.data.lists || []);
+                const activityResponse = await api.get(`/boards/${boardId}/activities`);
+                setActivities(activityResponse.data);
             } catch (err) {
                 setError('Failed to fetch board data.');
                 console.error(err);
@@ -162,6 +167,9 @@ function BoardPage() {
         });
     }
 
+    
+    
+
     const openShareModal = () => setIsShareModalOpen(true);
     const closeShareModal = () => setIsShareModalOpen(false);
 
@@ -170,65 +178,93 @@ function BoardPage() {
 
     return (
         <DndContext
-            sensors={sensors}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            collisionDetection={closestCorners}
+          sensors={sensors}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          collisionDetection={closestCorners}
         >
-            <div className="board-page-container">
-                <div className="board-page-header">
-                    <Link to="/" className="back-link">← Back to Boards</Link>
-                    
-                    {board?.currentUserRole === 'Owner' && (
-                        <button onClick={openShareModal} className="share-board-button">
-                            Share
-                        </button>
-                    )}
-                </div>
-                
-                <h1 className="board-title-center">{board?.title}</h1>
-
-                <div className="lists-container">
-                    {lists.map(list => (
-                        <ListComponent
-                            key={list.id}
-                            list={list}
-                            onDeleteList={handleDeleteList}
-                            setLists={setLists}
-                            onCardClick={openCardModal}
-                        />
-                    ))}
-                    <div className="list add-list-form">
-                        <form onSubmit={handleCreateList}>
-                            <input
-                                type="text"
-                                value={newListTitle}
-                                onChange={(e) => setNewListTitle(e.target.value)}
-                                placeholder="Enter list title..."
-                            />
-                            <button type="submit">Add List</button>
-                        </form>
-                    </div>
-                </div>
+          <div className="board-page-container">
+            {/* Header */}
+            <div className="board-page-header">
+              <Link to="/" className="back-link">← Back to Boards</Link>
+      
+              {/* Buttons on the right, stacked vertically */}
+              <div className="board-actions-vertical">
+                {board?.currentUserRole === 'Owner' && (
+                  <button className="board-action-button" onClick={openShareModal}>
+                    Share Board with Others
+                  </button>
+                )}
+                <button
+                  className="board-action-button"
+                  onClick={() => setIsActivityLogOpen(true)}
+                >
+                  See Activities
+                </button>
+              </div>
             </div>
-            <ShareBoardModal 
-                isOpen={isShareModalOpen}
-                onRequestClose={closeShareModal}
-                boardId={boardId}
-                currentUserRole={board?.currentUserRole} 
-            />
-            <CardModal 
-                isOpen={isModalOpen}
-                onRequestClose={closeCardModal}
-                card={selectedCard}
-                onSave={handleSaveCard}
-                onDelete={handleDeleteCard}
-            />
-            <DragOverlay>
-                {activeCard ? <DraggableCard card={activeCard} /> : null}
-            </DragOverlay>
+      
+            {/* Board Title */}
+            <h1 className="board-title-center">{board?.title}</h1>
+      
+            {/* Lists Container */}
+            <div className="lists-container">
+              {lists.map(list => (
+                <ListComponent
+                  key={list.id}
+                  list={list}
+                  onDeleteList={handleDeleteList}
+                  setLists={setLists}
+                  onCardClick={openCardModal}
+                />
+              ))}
+      
+              {/* Add List Form */}
+              <div className="list add-list-form">
+                <form onSubmit={handleCreateList}>
+                  <input
+                    type="text"
+                    value={newListTitle}
+                    onChange={(e) => setNewListTitle(e.target.value)}
+                    placeholder="Enter list title..."
+                  />
+                  <button type="submit">Add List</button>
+                </form>
+              </div>
+            </div>
+          </div>
+      
+          {/* Activity Log Panel */}
+          <ActivityLogPanel 
+            isOpen={isActivityLogOpen}
+            onClose={() => setIsActivityLogOpen(false)}
+            activities={activities}
+          />
+      
+          {/* Share Board Modal */}
+          <ShareBoardModal 
+            isOpen={isShareModalOpen}
+            onRequestClose={closeShareModal}
+            boardId={boardId}
+            currentUserRole={board?.currentUserRole} 
+          />
+      
+          {/* Card Modal */}
+          <CardModal 
+            isOpen={isModalOpen}
+            onRequestClose={closeCardModal}
+            card={selectedCard}
+            onSave={handleSaveCard}
+            onDelete={handleDeleteCard}
+          />
+      
+          {/* Drag Overlay */}
+          <DragOverlay>
+            {activeCard ? <DraggableCard card={activeCard} /> : null}
+          </DragOverlay>
         </DndContext>
-    );
+      );        
+    
 }
 
 export default BoardPage;

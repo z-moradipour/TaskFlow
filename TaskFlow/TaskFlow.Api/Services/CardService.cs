@@ -116,6 +116,55 @@ namespace TaskFlow.Api.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task ReorderCardsAsync(int listId, List<int> orderedCardIds)
+        {
+            // Fetch all relevant cards
+            var cards = await _context.Cards
+                .Where(c => orderedCardIds.Contains(c.Id))
+                .ToListAsync();
+            if (!cards.Any()) return;
+
+            // Get list titles for logging
+            var allListIds = cards.Select(c => c.ListId).Append(listId).Distinct();
+            var lists = await _context.Lists
+                .AsNoTracking()
+                .Where(l => allListIds.Contains(l.Id))
+                .ToDictionaryAsync(l => l.Id, l => l.Title);
+
+            var boardId = await _context.Lists
+                .Where(l => l.Id == listId)
+                .Select(l => l.BoardId)
+                .FirstOrDefaultAsync();
+
+            var user = await _userManager.FindByIdAsync(CurrentUserId);
+
+            // Update listId and log for moved cards
+            foreach (var card in cards)
+            {
+                if (card.ListId != listId)
+                {
+                    var oldListId = card.ListId;
+                    card.ListId = listId;
+
+                    await _auditService.LogActivityAsync(
+                        boardId,
+                        CurrentUserId,
+                        $"{user?.UserName} moved card '{card.Title}' from list '{lists[oldListId]}' to list '{lists[listId]}'"
+                    );
+                }
+            }
+
+            // Update positions
+            for (int i = 0; i < orderedCardIds.Count; i++)
+            {
+                var card = cards.FirstOrDefault(c => c.Id == orderedCardIds[i]);
+                if (card != null) card.Position = i;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         //public async Task ReorderCardsAsync(int listId, List<int> orderedCardIds)
         //{
         //    var cardsInNewOrder = await _context.Cards
@@ -136,56 +185,5 @@ namespace TaskFlow.Api.Services
 
         //    await _context.SaveChangesAsync();
         //}
-        public async Task ReorderCardsAsync(int listId, List<int> orderedCardIds)
-        {
-            var cards = await _context.Cards
-                .Where(c => orderedCardIds.Contains(c.Id))
-                .ToListAsync();
-
-            var cardDict = cards.ToDictionary(c => c.Id);
-
-            if (!cards.Any())
-                return;
-
-            var allListIds = cards.Select(c => c.ListId).Append(listId).Distinct().ToList();
-            var lists = await _context.Lists
-                .AsNoTracking()
-                .Where(l => allListIds.Contains(l.Id))
-                .ToDictionaryAsync(l => l.Id, l => l.Title);
-
-            var boardId = await _context.Lists
-                .Where(l => l.Id == listId)
-                .Select(l => l.BoardId)
-                .FirstOrDefaultAsync();
-
-            var user = await _userManager.FindByIdAsync(CurrentUserId);
-
-            for (int i = 0; i < orderedCardIds.Count; i++)
-            {
-                var cardId = orderedCardIds[i];
-                if (!cardDict.TryGetValue(cardId, out var card))
-                    continue;
-
-                if (card.ListId != listId)
-                {
-                    var oldListId = card.ListId;
-                    card.ListId = listId;
-                    card.Position = i;
-
-                    await _auditService.LogActivityAsync(
-                        boardId,
-                        CurrentUserId,
-                        $"{user?.UserName} moved card '{card.Title}' from list '{lists[oldListId]}' to list '{lists[listId]}'"
-                    );
-                }
-                else
-                {
-                    card.Position = i;
-                }
-            }
-
-            await _context.SaveChangesAsync();
-        }
-
     }
 }

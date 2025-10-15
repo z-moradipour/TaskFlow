@@ -2,7 +2,7 @@
 
 TaskFlow is a modern, full-stack web application designed to help users manage their projects and tasks in a visual, Kanban-style workflow. It is built with a clean, decoupled architecture using an ASP.NET Core backend and a React frontend.
 
-![TaskFlow Screenshot](https://github.com/user-attachments/assets/f553ec6e-c0a7-449c-b994-cd0b5d488d94)
+![TaskFlow Screenshot](https://github.com/user-attachments/assets/d457cb97-23c2-452b-85ca-8ed02ccbbd36)
 
 ---
 
@@ -15,6 +15,9 @@ The application currently supports a robust set of features for a complete proje
 - **List Management**: Add, rename (inline editing), and delete lists (e.g., "To Do", "In Progress", "Done") within a board.
 - **Card Management**: Create, edit (title and description), delete, and reorder task cards within each list.
 - **Drag-and-Drop**: Smoothly move cards between lists and reorder them within a list, with all changes saved persistently.
+- **Activity Log**: Automatically records all actions performed on a board. For example:
+  - When a card is created: "User X created card 'Y' in list 'Z'"
+  - When a card is moved between lists: "User X moved card 'Y' from list 'Z' to list 'W'"
 
 ### Authentication & Authorization
 - **User Accounts**: Secure user registration and login system using ASP.NET Core Identity.
@@ -86,8 +89,6 @@ This project is a solid foundation, and the following professional-grade feature
 
 - **✅ Automated Tests (Coming Soon)**
   - Write unit tests for the backend service layer using xUnit or NUnit to ensure code quality and reliability.
-- **✅ Activity Log (Coming Soon)**
-  - Implement a system to track and display a history of all actions performed on a board (e.g., "User X moved card Y").
 - **✅ Real-time Collaboration with SignalR (Coming Soon)**
   - Integrate ASP.NET Core SignalR to enable live, real-time updates across all connected clients. When one user moves a card, it will move instantly for all other users viewing the same board.
 - **✅ Responsive Frontend Design (Coming Soon)**
