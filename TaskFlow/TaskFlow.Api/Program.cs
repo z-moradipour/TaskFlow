@@ -18,6 +18,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IListService, ListService>();
 builder.Services.AddScoped<ICardService, CardService>();
+builder.Services.AddScoped<IAuditService, AuditService>();
 
 // 2. EF Core DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

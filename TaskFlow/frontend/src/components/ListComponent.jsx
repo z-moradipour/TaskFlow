@@ -11,26 +11,25 @@ function ListComponent({ list, onDeleteList, setLists, onCardClick }) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(list.title);
 
-  const handleCreateCard = async (e) => {
-    e.preventDefault();
-    if (!newCardTitle.trim()) return;
+const handleCreateCard = async (e) => {
+  e.preventDefault();
+  if (!newCardTitle.trim()) return;
 
-    try {
+  try {
       const newCardDto = { title: newCardTitle };
-      const response = await api.post(`https://localhost:7289/api/Cards/list/${list.id}`, newCardDto);
-      
+      const response = await api.post(`/Cards/list/${list.id}`, newCardDto);
       setLists(prevLists =>
-        prevLists.map(l =>
-          l.id === list.id
-            ? { ...l, cards: [...l.cards, response.data] }
-            : l
-        )
+          prevLists.map(l =>
+              l.id === list.id
+                  ? { ...l, cards: [...l.cards, response.data] }
+                  : l
+          )
       );
       setNewCardTitle('');
-    } catch (err) {
+  } catch (err) {
       console.error("Error creating card:", err);
-    }
-  };
+  }
+};
 
   const handleTitleSave = async () => {
     if (!editedTitle.trim() || editedTitle === list.title) {

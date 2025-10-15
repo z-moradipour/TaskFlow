@@ -14,5 +14,7 @@ namespace TaskFlow.Api.Data
         public DbSet<List> Lists { get; set; }
         public DbSet<Card> Cards { get; set; }
         public DbSet<BoardMembership> BoardMemberships { get; set; }
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
+
     }
 }
